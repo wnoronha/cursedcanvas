@@ -43,7 +43,7 @@ bun run check    # fmt:check + lint + typecheck + test + build
 - Distributed via **GitHub Releases** only (tarball with prebuilt `dist/`) — not npm.
 - Tag `v*.*.*` → `.github/workflows/release.yml` (`bun run check`, `bun pm pack`, `softprops/action-gh-release@v3`).
 - CI: `ubuntu-latest`, `actions/checkout@v7`, `oven-sh/setup-bun@v2`, `actions/upload-artifact@v7`.
-- Install: `bunx https://github.com/wnoronha/cursedcanvas/releases/download/vX.Y.Z/cursedcanvas-X.Y.Z.tgz`
+- Install: `bunx -p https://github.com/wnoronha/cursedcanvas/releases/download/vX.Y.Z/cursedcanvas-X.Y.Z.tgz cursedcanvas`
 
 ## What not to put here
 

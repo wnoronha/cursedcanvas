@@ -12,14 +12,21 @@ Agents write canvases into `canvases/`. You review them in the browser via a Vit
 
 ```bash
 # pick a tag from https://github.com/wnoronha/cursedcanvas/releases
-bunx https://github.com/wnoronha/cursedcanvas/releases/download/v0.1.0/cursedcanvas-0.1.0.tgz
+bunx -p https://github.com/wnoronha/cursedcanvas/releases/download/v0.1.0/cursedcanvas-0.1.0.tgz cursedcanvas
 ```
 
-Bins inside the package: `cursedcanvas` and `cc`.
+Bins: `cursedcanvas` and `cc`. (`bunx` needs `-p <tarball>` because a bare URL is not a valid package id.)
 
 ```bash
-bunx https://github.com/wnoronha/cursedcanvas/releases/download/v0.1.0/cursedcanvas-0.1.0.tgz \
+bunx -p https://github.com/wnoronha/cursedcanvas/releases/download/v0.1.0/cursedcanvas-0.1.0.tgz cursedcanvas \
   --dir . --port 5173 --bridge-port 8787
+```
+
+Or install into a project:
+
+```bash
+bun add https://github.com/wnoronha/cursedcanvas/releases/download/v0.1.0/cursedcanvas-0.1.0.tgz
+bunx cursedcanvas
 ```
 
 | Flag            | Default     | Meaning                            |

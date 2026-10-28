@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Cursed Canvas CLI — run via GitHub Release tarball or local checkout:
- *   bunx https://github.com/wnoronha/cursedcanvas/releases/download/v0.1.0/cursedcanvas-0.1.0.tgz
+ *   bunx -p https://github.com/wnoronha/cursedcanvas/releases/download/v0.1.0/cursedcanvas-0.1.0.tgz cursedcanvas
  *   bun start   (from a built checkout)
  *   cc          (bin alias)
  *
@@ -54,8 +54,8 @@ Options:
   -v, --version          Show version
 
 Examples:
-  bunx <release-tarball-url>
-  bunx <release-tarball-url> --dir ./my-project
+  bunx -p <release-tarball-url> cursedcanvas
+  bunx -p <release-tarball-url> cursedcanvas --dir ./my-project
   bun start -- --port 4173
 `);
 }
