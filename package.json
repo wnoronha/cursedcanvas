@@ -1,0 +1,73 @@
+{
+  "name": "cursedcanvas",
+  "version": "0.1.0",
+  "description": "Cursed Canvas (CC) — Cursor-style .canvas.tsx viewer + localhost agent event bus",
+  "keywords": [
+    "agent",
+    "c4",
+    "canvas",
+    "cc",
+    "cursed-canvas",
+    "cursor",
+    "mermaid",
+    "pele",
+    "sse"
+  ],
+  "license": "MIT",
+  "author": "Cursed Canvas contributors",
+  "bin": {
+    "cc": "bin/cursedcanvas.mjs",
+    "cursedcanvas": "bin/cursedcanvas.mjs"
+  },
+  "files": [
+    "bin",
+    "bridge",
+    "dist",
+    "canvases",
+    "packages",
+    "CURSED_SKILL.md",
+    "README.md",
+    "LICENSE",
+    "AGENTS.md"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "bridge": "bun bridge/server.mjs",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b --pretty false",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "bun run fmt:check && bun run lint && bun run typecheck && bun run test && bun run build",
+    "preview": "vite preview",
+    "start": "bun bin/cursedcanvas.mjs --no-open",
+    "prepublishOnly": "bun run build"
+  },
+  "dependencies": {
+    "cursor": "file:packages/cursor-pkg",
+    "pele": "^1.12.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "happy-dom": "^21.0.4",
+    "oxfmt": "^0.75.0",
+    "oxlint": "^1.89.0",
+    "typescript": "~7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "bun": ">=1.2",
+    "node": ">=20"
+  },
+  "packageManager": "bun@1.4.4"
+}
