@@ -45,7 +45,7 @@
     "check": "bun run fmt:check && bun run lint && bun run typecheck && bun run test && bun run build",
     "preview": "vite preview",
     "start": "bun bin/cursedcanvas.mjs --no-open",
-    "prepublishOnly": "bun run build"
+    "pack": "bun run build && bun pm pack"
   },
   "dependencies": {
     "cursor": "file:packages/cursor-pkg",

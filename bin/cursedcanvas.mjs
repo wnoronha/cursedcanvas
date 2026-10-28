@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Cursed Canvas CLI — run via:
- *   npx cursedcanvas
- *   bunx cursedcanvas
+ * Cursed Canvas CLI — run via GitHub Release tarball or local checkout:
+ *   bunx https://github.com/wnoronha/cursedcanvas/releases/download/v0.1.0/cursedcanvas-0.1.0.tgz
+ *   bun start   (from a built checkout)
  *   cc          (bin alias)
  *
  * Starts the SSE bridge + serves the built viewer (dist/).
@@ -54,9 +54,9 @@ Options:
   -v, --version          Show version
 
 Examples:
-  bunx cursedcanvas
-  bunx cursedcanvas --dir ./my-project
-  npx cursedcanvas@latest -- --port 4173
+  bunx <release-tarball-url>
+  bunx <release-tarball-url> --dir ./my-project
+  bun start -- --port 4173
 `);
 }
 

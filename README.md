@@ -4,21 +4,22 @@ Lightweight browser runtime for Cursor-style `.canvas.tsx` files (**CC**).
 
 Agents write canvases into `canvases/`. You review them in the browser via a Vite app that reimplements the `cursor/canvas` API, with a localhost SSE bus for annotate → agent loops.
 
-This repo is **Bun-first** (`packageManager: bun@1.4.4`). `bunx` / `npx` both work for the published CLI.
+**Bun-first** (`packageManager: bun@1.4.4`). Distributed via [GitHub Releases](https://github.com/wnoronha/cursedcanvas/releases) (not npm).
 
-## Run without installing
+## Install / run
+
+### From a GitHub Release (prebuilt viewer)
 
 ```bash
-bunx cursedcanvas@latest
-# or
-npx cursedcanvas@latest
+# pick a tag from https://github.com/wnoronha/cursedcanvas/releases
+bunx https://github.com/wnoronha/cursedcanvas/releases/download/v0.1.0/cursedcanvas-0.1.0.tgz
 ```
 
-Bins: `cursedcanvas` and `cc`.
+Bins inside the package: `cursedcanvas` and `cc`.
 
 ```bash
-bunx cursedcanvas --dir . --port 5173 --bridge-port 8787
-bunx cursedcanvas --help
+bunx https://github.com/wnoronha/cursedcanvas/releases/download/v0.1.0/cursedcanvas-0.1.0.tgz \
+  --dir . --port 5173 --bridge-port 8787
 ```
 
 | Flag            | Default     | Meaning                            |
@@ -30,14 +31,20 @@ bunx cursedcanvas --help
 | `--no-bridge`   | off         | Viewer only                        |
 | `--no-open`     | off         | Skip opening a browser             |
 
-Published releases ship a prebuilt viewer (`dist/`). For **authoring** canvases with HMR, use a checkout (below).
-
-## Develop from a checkout
+### From source (HMR authoring)
 
 ```bash
+git clone https://github.com/wnoronha/cursedcanvas.git
+cd cursedcanvas
 bun install
 bun run bridge   # terminal 1 — SSE on :8787
 bun run dev      # terminal 2 — Vite HMR viewer
+```
+
+Or serve the production build locally:
+
+```bash
+bun run build && bun start
 ```
 
 Open the URL Vite prints (default http://localhost:5173), then pick a canvas from the topbar switcher.
@@ -92,11 +99,9 @@ curl -N http://127.0.0.1:8787/events
 
 ## Release
 
-CI uses **ubuntu-latest**, **actions/checkout@v7**, **oven-sh/setup-bun@v2**, **actions/upload-artifact@v7**. Tag releases publish to npm (Node setup for provenance) and create a GitHub Release via **softprops/action-gh-release@v3**.
+Tag `v*.*.*` → CI runs `bun run check`, packs a tarball (includes `dist/`), and attaches it to a **GitHub Release**. No npm publish.
 
 ```bash
 git tag v0.1.0
 git push origin v0.1.0
 ```
-
-Requires repo secret `NPM_TOKEN`.
