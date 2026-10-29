@@ -9,7 +9,11 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      // Prefer the file: cursor package; keep an explicit alias for HMR.
+      // Public surface is `cursor/canvas` only. `@cursedcanvas/sdk` is an
+      // internal link: bun copies file: packages on install, so
+      // packages/cursor-pkg/canvas.ts must import it by package name
+      // (a relative ../sdk path breaks once copied to node_modules).
+      // Keep this alias pointing at the same source for Vite HMR.
       "cursor/canvas": path.resolve(root, "packages/sdk/index.ts"),
     },
   },
