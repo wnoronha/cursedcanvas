@@ -336,7 +336,7 @@ export function AnnotateTool({
     const value = text.trim();
     if (!value || !draft || busy) return;
     if (!bridgeUp) {
-      setStatus("Bridge down — run npm run bridge");
+      setStatus("Bridge down — run bun run bridge");
       return;
     }
     setBusy(true);
@@ -393,7 +393,7 @@ export function AnnotateTool({
           disabled={annotateDisabled}
           title={
             bridgeUp === false
-              ? "Bridge down — run npm run bridge"
+              ? "Bridge down — run bun run bridge"
               : bridgeUp === null
                 ? "Checking bridge…"
                 : "Annotate → click C4 node/edge or block → comment · or ⌘K then Enter"
