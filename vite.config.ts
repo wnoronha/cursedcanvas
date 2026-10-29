@@ -20,4 +20,10 @@ export default defineConfig({
   server: {
     port: 5173,
   },
+  build: {
+    // Pele (~710 kB min) ships as its own lazy chunk — dynamic import in
+    // packages/sdk/diagram.tsx, fetched only when a Diagram mounts and never
+    // referenced by index.html — so it sits outside the first-load budget.
+    chunkSizeWarningLimit: 800,
+  },
 });
