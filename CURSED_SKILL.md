@@ -98,18 +98,18 @@ In the viewer: **Annotate** → select a region (click a block or drag) → add 
 
 Event kinds:
 
-| `event`      | Meaning                                                 | What you should do                                                 |
-| ------------ | ------------------------------------------------------- | ------------------------------------------------------------------ |
-| `hello`      | Stream connected; includes cwd + endpoint hints         | Ready to receive                                                   |
-| `action`     | Canvas `useCanvasAction` (openFile / askAgent / resume) | Read `data.action` + file fields; edit the canvas or open the path |
-| `annotation` | Human Annotate → select → comment                       | Follow `data.text`; use `data.target` / `absolutePath` / `path`    |
+| `event`      | Meaning                                                                                                                                                                                        | What you should do                                                 |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `hello`      | Stream connected (`id: 0` always first); cwd + endpoint hints at `data.action.{cwd,events,annotate}`                                                                                           | Ready to receive                                                   |
+| `action`     | Canvas `useCanvasAction` (`openFile`, `newComposerChat`→`askAgent`, `openAgent`→`resumeAgent`; `askAgent`/`resumeAgent` passthrough). Published with `source: "viewer"`; `spawn` field ignored | Read `data.action` + file fields; edit the canvas or open the path |
+| `annotation` | Human Annotate → select → comment                                                                                                                                                              | Follow `data.text`; use `data.target` / `absolutePath` / `path`    |
 
 ### Durability and cursors
 
 - Events are kept in an **in-memory ring buffer** (last **200**). Not durable — bridge restart clears the log. This is a live bus, not a persistent queue.
 - The server does **not** track per-agent offsets. Live SSE subscribers receive events as they are published.
-- On reconnect, send SSE header `Last-Event-ID: <id>` to replay buffered events with `id > Last-Event-ID`. Plain `curl -N` does not remember a cursor — agents must store the last consumed `id` themselves (or use `EventSource`, which resends `Last-Event-ID` automatically).
-- `GET /recent?limit=N` returns the same in-memory buffer as JSON (catch-up without SSE).
+- On reconnect, send request header `Last-Event-ID: <id>` to replay buffered events with `id > Last-Event-ID`. Plain `curl -N` does not remember a cursor — agents must store the last consumed `id` themselves (or use `EventSource`, which resends `Last-Event-ID` automatically). An unparsable header falls back to the last 20 buffered events. The server also sends `: ping` heartbeats every 15s.
+- `GET /recent?limit=N` returns the same in-memory buffer as JSON (default 20, catch-up without SSE).
 
 Payload shape (JSON in `data:`):
 
@@ -126,9 +126,18 @@ Payload shape (JSON in `data:`):
   "target": "Named entity card",
   "text": "Fix the Charts intro copy",
   "instruction": "Edit the canvas file (/Users/you/.../example-overview.canvas.tsx) — focus UI block “Named entity card” — Fix the Charts intro copy",
-  "rect": { "top": 120, "left": 24, "width": 640, "height": 96 }
+  "rect": { "top": 120, "left": 24, "width": 640, "height": 96 },
+  "c4Id": "svc-a",
+  "c4Label": "Service A",
+  "c4From": "user",
+  "c4To": "svc-a",
+  "selection": null,
+  "source": "viewer",
+  "action": null
 }
 ```
+
+`instruction` is server-synthesized (`Edit the canvas file (<absolutePath>) <C4 hint> — <text>`, where the C4 hint is `— C4 Rel from→to (id)`, `— C4 element "label" (id)`, or `— focus UI block "target"`). `action` events carry the mapped host action (`openFile` / `askAgent` / `resumeAgent`) plus `text`/`instruction` derived per type.
 
 Use `absolutePath` (or `cwd` + `path`) to open/edit the file. Use `target` + `text` (or `instruction`) for what to change.
 
