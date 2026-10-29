@@ -94,6 +94,8 @@ bun run bridge   # http://127.0.0.1:8787
 curl -N http://127.0.0.1:8787/events
 ```
 
+Check `GET /health` (`{"ok":true,"mode":"events","subscribers":N}`) to confirm the bridge is up before debugging an empty stream. Bridge binds `127.0.0.1:8787` by default (`BRIDGE_HOST`/`BRIDGE_PORT` to change); the viewer targets the same default unless built with `VITE_BRIDGE_URL` — keep them in agreement.
+
 In the viewer: **Annotate** → select a region (click a block or drag) → add a comment → **Send to agents**. That publishes an `annotation` event with file metadata + `target` + `rect`.
 
 Event kinds:
