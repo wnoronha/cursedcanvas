@@ -1,9 +1,7 @@
 /**
  * Generic host actions — canvas Cursor actions map onto these.
- * Adapters implement whatever subset they support.
+ * Published over SSE; viewers and agents consume them from the event bus.
  */
-
-/** @typedef {'cursor' | 'agy'} AdapterId */
 
 /**
  * @typedef {object} OpenFileAction
