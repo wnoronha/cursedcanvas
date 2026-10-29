@@ -40,8 +40,32 @@ function nodeLabel(el: Element, id: string): string {
   return cleanLabel(first) || id;
 }
 
-function edgeParts(edgeId: string): { from: string; to: string } | null {
-  const i = edgeId.indexOf("-");
+function edgeParts(edgeId: string, root?: ParentNode | null): { from: string; to: string } | null {
+  // Pele builds edge ids as `from + "-" + to` with no escaping, so a naive
+  // split is ambiguous when an alias contains "-". Resolve structurally:
+  // match the longest rendered node id that prefixes `from-`, then require
+  // the remainder to match a rendered node id. Fall back to last-"-" split
+  // when nodes aren't available (detached SVG in tests, portals).
+  if (root) {
+    const nodes = new Set<string>();
+    for (const n of root.querySelectorAll(".pele-node[data-id]")) {
+      const id = dataId(n);
+      if (id) nodes.add(id);
+    }
+    if (nodes.size > 0) {
+      let from: string | null = null;
+      for (const id of nodes) {
+        if (edgeId.startsWith(`${id}-`) && (from === null || id.length > from.length)) {
+          from = id;
+        }
+      }
+      if (from !== null) {
+        const to = edgeId.slice(from.length + 1);
+        if (to && nodes.has(to)) return { from, to };
+      }
+    }
+  }
+  const i = edgeId.lastIndexOf("-");
   if (i <= 0) return null;
   return { from: edgeId.slice(0, i), to: edgeId.slice(i + 1) };
 }
@@ -56,18 +80,18 @@ function fromNode(el: Element): PeleHit | null {
 function fromEdge(el: Element): PeleHit | null {
   const id = dataId(el);
   if (!id) return null;
-  const parts = edgeParts(id);
+  const root: ParentNode =
+    (el instanceof SVGElement ? el.ownerSVGElement : null) ??
+    el.closest("svg") ??
+    el.ownerDocument ??
+    el;
+  const parts = edgeParts(id, root);
   let label = "";
   if (el.classList.contains("pele-edge-label")) {
     label = cleanLabel(el.textContent || "");
   } else {
     const safe = id.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
     // Scope to the SVG — nodes may not be attached to `document` yet (tests / portals).
-    const root: ParentNode =
-      (el instanceof SVGElement ? el.ownerSVGElement : null) ??
-      el.closest("svg") ??
-      el.ownerDocument ??
-      el;
     const labelEl = root.querySelector(`.pele-edge-label[data-id="${safe}"]`);
     label = cleanLabel(labelEl?.textContent || "");
   }
