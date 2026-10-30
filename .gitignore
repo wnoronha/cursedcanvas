@@ -38,3 +38,6 @@ bun-debug.log*
 *.njsproj
 *.sln
 *.sw?
+.opencode/skills/
+.agents/skills/
+.opencode/agents/
