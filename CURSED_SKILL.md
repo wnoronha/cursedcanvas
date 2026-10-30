@@ -1,6 +1,6 @@
 # Cursed Canvas skill
 
-Importable skill for agents that **author** or **live-edit** Cursor-style `.canvas.tsx` files against a standalone cursed-canvas runtime (Vite viewer + localhost event bus).
+Importable skill for agents that **author** or **live-edit** Cursor-style `.canvas.tsx` files against a standalone cursed-canvas runtime: the Vite viewer and the localhost event bus.
 
 A canvas is a single React TSX file rendered in the browser viewer (or Cursor IDE). Follow these rules whether you are creating a canvas from scratch or applying annotation events from the bus.
 
@@ -14,11 +14,11 @@ belong in another tool.
 
 ## File rules
 
-1. Write **exactly one** file: `canvases/<kebab-name>.canvas.tsx`.
-2. Import **only** from `cursor/canvas`. No relative imports, no npm packages, no Node built-ins.
-3. **Default-export** the top-level component.
-4. Embed all data inline. **No `fetch()` or network calls.**
-5. Never ship empty placeholder sections. If you lack data, omit the section or ask.
+- Write **exactly one** file: `canvases/<kebab-name>.canvas.tsx`.
+- Import **only** from `cursor/canvas`. No relative imports, no npm packages, no Node built-ins.
+- **Default-export** the top-level component.
+- Embed all data inline. **No `fetch()` or network calls.**
+- Never ship empty placeholder sections. If you lack data, omit the section or ask.
 
 Example:
 
@@ -77,7 +77,7 @@ C4 levels: `C4Context` (C1), `C4Container` (C2), `C4Component` (C3). For Code (L
 - `dark` or `light` — Pele stock sheets
 - `host` — map solid Cursor palette colors into `--pele-*` (avoid alpha fill/stroke tokens)
 
-Mindmap caveat: do not name a child node `mindmap` (keyword collision). Quote or rename it.
+In mindmaps, do not name a child node `mindmap` (keyword collision). Quote or rename it.
 
 ## Design constraints
 
@@ -108,7 +108,7 @@ Event kinds:
 
 ### Durability and cursors
 
-- Events are kept in an **in-memory ring buffer** (last **200**). Not durable — bridge restart clears the log. This is a live bus, not a persistent queue.
+- Events are kept in an **in-memory ring buffer** (last `200`). Not durable — bridge restart clears the log. This is a live bus, not a persistent queue.
 - The server does **not** track per-agent offsets. Live SSE subscribers receive events as they are published.
 - On reconnect, send request header `Last-Event-ID: <id>` to replay buffered events with `id > Last-Event-ID`. Plain `curl -N` does not remember a cursor. Agents must store the last consumed `id` themselves (or use `EventSource`, which resends `Last-Event-ID` automatically). An unparsable header falls back to the last 20 buffered events. The server also sends `: ping` heartbeats every 15s.
 - `GET /recent?limit=N` returns the same in-memory buffer as JSON (default 20, catch-up without SSE).
@@ -145,10 +145,10 @@ Use `absolutePath` (or `cwd` with `path`) to open or edit the file. Use `target`
 
 Rules when handling an event:
 
-1. Edit **only** the referenced canvas (`absolutePath` or `path`). Ask if it is missing.
-2. Keep the file a valid `cursor/canvas` default export — still no `fetch()`, no extra imports.
-3. After writing, the Vite viewer refreshes through HMR. No restart is needed.
-4. Optional: `GET /recent` or reconnect with `Last-Event-ID` if you missed live events (still only the last 200, in memory).
+- Edit **only** the referenced canvas (`absolutePath` or `path`). Ask if it is missing.
+- Keep the file a valid `cursor/canvas` default export — still no `fetch()`, no extra imports.
+- After writing, the Vite viewer refreshes through HMR. No restart is needed.
+- Optional: `GET /recent` or reconnect with `Last-Event-ID` if you missed live events (still only the last 200, in memory).
 
 Publish an annotation yourself from tests or other tools:
 

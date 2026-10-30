@@ -30,12 +30,12 @@ bun run check    # fmt:check + lint + typecheck + test + build
 
 ## Development rules
 
-1. Keep the public canvas API compatible with Cursor's `cursor/canvas` surface. Extend it carefully, and mirror changed types and docs in the skill.
-2. Canvases for this project live only under repo `canvases/`. Do **not** write product canvases to `~/.cursor/projects/.../canvases/` for this runtime — the browser viewer does not load that path.
-3. Prefer changing `packages/sdk` over special-casing the viewer when fixing primitive behavior (charts, theme, forms).
-4. Bridge stays **SSE publish/subscribe** (annotations and actions). Do not reintroduce adapter spawn as the default path.
-5. When you change event payload fields, buffer semantics, or annotate UX, update **[CURSED_SKILL.md](./CURSED_SKILL.md)** so imported skills stay accurate.
-6. Smoke-test UI flows with `agent-browser` when touching annotate or viewer chrome.
+- Keep the public canvas API compatible with Cursor's `cursor/canvas` surface. Extend it carefully, and mirror changed types and docs in the skill.
+- Canvases for this project live only under repo `canvases/`. Do **not** write product canvases to `~/.cursor/projects/.../canvases/` for this runtime — the browser viewer does not load that path.
+- Prefer changing `packages/sdk` over special-casing the viewer when fixing primitive behavior (charts, theme, forms).
+- Bridge stays **SSE publish/subscribe** (annotations and actions). Do not reintroduce adapter spawn as the default path.
+- When you change event payload fields, buffer semantics, or annotate UX, update **[CURSED_SKILL.md](./CURSED_SKILL.md)** so imported skills stay accurate.
+- When touching annotate or viewer chrome, smoke-test UI flows with `agent-browser`.
 
 ## Release
 

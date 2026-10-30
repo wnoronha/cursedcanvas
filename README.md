@@ -4,7 +4,7 @@ Lightweight browser runtime for Cursor-style `.canvas.tsx` files (**CC**).
 
 Agents write canvases into `canvases/`. You review them in the browser via a Vite app that reimplements the `cursor/canvas` API, with a localhost SSE bus for annotate → agent loops.
 
-**Bun-first** (`packageManager: bun@1.4.4`). Distributed via [GitHub Releases](https://github.com/wnoronha/cursedcanvas/releases) (not npm).
+**Bun-first** (`packageManager: bun@1.4.4`). Distributed through [GitHub Releases](https://github.com/wnoronha/cursedcanvas/releases), not npm.
 
 ## Install and run
 
