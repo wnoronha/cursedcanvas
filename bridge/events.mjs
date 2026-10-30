@@ -78,9 +78,10 @@ export function attachSse(req, res, meta) {
   });
   if (typeof res.flushHeaders === "function") res.flushHeaders();
 
-  // Replay after Last-Event-ID when present
+  // Replay after Last-Event-ID when present; fresh subscribers
+  // get the tail only, not the whole ring.
   const lastRaw = req.headers["last-event-id"];
-  const lastId = lastRaw ? Number(lastRaw) : 0;
+  const lastId = lastRaw == null || lastRaw === "" ? NaN : Number(lastRaw);
   const replay = Number.isFinite(lastId) ? buffer.filter((e) => e.id > lastId) : buffer.slice(-20);
 
   res.write(

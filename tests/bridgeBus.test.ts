@@ -45,6 +45,36 @@ describe("publish / recentEvents", () => {
     expect(subscriberCount()).toBe(before);
   });
 
+  it("fresh subscribers get the tail, not the whole ring", () => {
+    for (let i = 0; i < 25; i++) publish({ kind: "annotation", text: `tail-${i}` });
+    const written = [];
+    const handlers = {};
+    const req = {
+      headers: {},
+      on: (ev, fn) => {
+        handlers[ev] = fn;
+      },
+    };
+    const res = {
+      writeHead: () => {},
+      write: (c) => written.push(c),
+    };
+    const before = subscriberCount();
+    attachSse(
+      req as unknown as import("node:http").IncomingMessage,
+      res as unknown as import("node:http").ServerResponse,
+      { cwd: "/tmp", port: 1, host: "127.0.0.1" },
+    );
+    expect(subscriberCount()).toBe(before + 1);
+    const body = written.join("\n");
+    expect(written[0]).toContain("event: hello");
+    expect(body).not.toContain('"tail-0"');
+    expect(body).toContain('"tail-24"');
+
+    handlers["close"]();
+    expect(subscriberCount()).toBe(before);
+  });
+
   it("recentEvents honors limit", () => {
     publish({ kind: "annotation", text: "x" });
     const all = recentEvents(1000);
