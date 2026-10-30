@@ -46,6 +46,32 @@ export function resolveCanvasFile(input) {
   }
 
   const absolutePath = path.isAbsolute(rel) ? rel : path.resolve(cwd, rel);
+  // Contain resolved paths to the project root. Absolute or escaping
+  // request paths fall back to canvases/<id> so SSE instructions
+  // never point agents at files outside the repo.
+  const relToCwd = path.relative(cwd, absolutePath);
+  const escapes =
+    relToCwd === ".." || relToCwd.startsWith(`..${path.sep}`) || path.isAbsolute(relToCwd);
+  if (escapes) {
+    if (!canvasId) {
+      return {
+        cwd,
+        canvasId,
+        path: undefined,
+        file: undefined,
+        absolutePath: undefined,
+      };
+    }
+    rel = `canvases/${canvasId}.canvas.tsx`;
+    const containedAbs = path.resolve(cwd, rel);
+    return {
+      cwd,
+      canvasId,
+      path: rel,
+      file: path.basename(containedAbs),
+      absolutePath: containedAbs,
+    };
+  }
   const file = path.basename(absolutePath);
   const repoPath = path.isAbsolute(rel) ? path.relative(cwd, rel).replace(/\\/g, "/") : rel;
 

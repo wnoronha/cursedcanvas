@@ -25,4 +25,23 @@ describe("resolveCanvasFile", () => {
     const meta = resolveCanvasFile({ cwd, path: "bar.canvas.tsx" });
     expect(meta.path).toBe("canvases/bar.canvas.tsx");
   });
+
+  it("contains absolute paths outside cwd", () => {
+    const meta = resolveCanvasFile({ cwd, path: "/etc/passwd" });
+    expect(meta.canvasId).toBe("passwd");
+    expect(meta.path).toBe("canvases/passwd.canvas.tsx");
+    expect(meta.absolutePath).toBe(path.join(cwd, "canvases/passwd.canvas.tsx"));
+  });
+
+  it("contains traversal paths outside cwd", () => {
+    const meta = resolveCanvasFile({ cwd, path: "../../etc/passwd" });
+    expect(meta.absolutePath).toBe(path.join(cwd, "canvases/passwd.canvas.tsx"));
+    expect(meta.path).toBe("canvases/passwd.canvas.tsx");
+  });
+
+  it("derives canvasId when containing escaping paths", () => {
+    const meta = resolveCanvasFile({ cwd, path: "/etc/passwd", canvasId: "   " });
+    expect(meta.canvasId).toBe("passwd");
+    expect(meta.absolutePath).toBe(path.join(cwd, "canvases/passwd.canvas.tsx"));
+  });
 });
