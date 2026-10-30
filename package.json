@@ -47,20 +47,19 @@
     "start": "bun bin/cursedcanvas.mjs --no-open",
     "pack": "bun run build && bun pm pack"
   },
-  "dependencies": {
-    "cursor": "file:packages/cursor-pkg",
-    "pele": "^1.12.0",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "cursor": "file:packages/cursor-pkg",
     "happy-dom": "^21.0.4",
     "oxfmt": "^0.75.0",
     "oxlint": "^1.89.0",
+    "pele": "^1.12.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "typescript": "~7.0.2",
     "vite": "^8.3.5",
     "vitest": "^5.0.5"
