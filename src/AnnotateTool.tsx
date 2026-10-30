@@ -372,8 +372,17 @@ export function AnnotateTool({
         }
       : null);
 
-  const commentTop = draft ? draft.rect.top + draft.rect.height + 10 : 0;
-  const commentLeft = draft ? draft.rect.left : 0;
+  const commentWidth = draft ? Math.max(300, Math.min(draft.rect.width, 440)) : 0;
+  // Clamp the comment form into the visible root so low selections
+  // do not push it out of view.
+  const rootW = rootRef.current?.clientWidth ?? 0;
+  const rootH = rootRef.current?.clientHeight ?? 0;
+  const commentTop = draft
+    ? Math.max(0, Math.min(draft.rect.top + draft.rect.height + 10, Math.max(0, rootH - 240)))
+    : 0;
+  const commentLeft = draft
+    ? Math.max(0, Math.min(draft.rect.left, Math.max(0, rootW - commentWidth - 8)))
+    : 0;
 
   const toolbar = (
     <div
@@ -502,7 +511,7 @@ export function AnnotateTool({
               position: "absolute",
               top: commentTop,
               left: commentLeft,
-              width: Math.max(300, Math.min(draft.rect.width, 440)),
+              width: commentWidth,
               zIndex: 4,
               display: "flex",
               flexDirection: "column",
