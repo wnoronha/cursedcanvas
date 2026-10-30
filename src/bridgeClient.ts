@@ -35,7 +35,8 @@ export type BridgeResult = {
 const DEFAULT_URL = "http://127.0.0.1:8787";
 
 export function bridgeUrl(): string {
-  return (import.meta.env.VITE_BRIDGE_URL as string | undefined) ?? DEFAULT_URL;
+  const raw = (import.meta.env.VITE_BRIDGE_URL as string | undefined) ?? DEFAULT_URL;
+  return raw.replace(/\/+$/, "") || DEFAULT_URL;
 }
 
 export function eventsUrl(): string {
