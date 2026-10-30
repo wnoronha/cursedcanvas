@@ -32,7 +32,7 @@
   ],
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "bun scripts/dev.mjs",
     "bridge": "bun bridge/server.mjs",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --pretty false",

@@ -9,19 +9,23 @@
  *   GET  /health
  */
 import http from "node:http";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { attachSse, publish, recentEvents, subscriberCount } from "./events.mjs";
 import { canvasActionToHost } from "./types.mjs";
 import { resolveCanvasFile } from "./meta.mjs";
 import { clampRecentLimit, readBody, validRect } from "./validate.mjs";
-import { attachSse, publish, recentEvents, subscriberCount } from "./events.mjs";
+import { bridgeUsage, parseBridgeArgs } from "./args.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(
-  process.env.CURSEDCANVAS_ROOT || process.env.BRIDGE_ROOT || path.join(__dirname, ".."),
-);
-const PORT = Number(process.env.BRIDGE_PORT ?? 8787);
-const HOST = process.env.BRIDGE_HOST ?? "127.0.0.1";
+const args = parseBridgeArgs(process.argv.slice(2));
+if (args.help || args.error || args.unknown) {
+  if (args.error) console.error(args.error);
+  if (args.unknown) console.error(`Unknown option: ${args.unknown}`);
+  console.log(bridgeUsage());
+  process.exit(args.exitCode ?? 0);
+}
+
+const ROOT = args.root;
+const PORT = args.port;
+const HOST = args.host;
 
 function corsHeaders() {
   return {

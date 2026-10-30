@@ -46,6 +46,8 @@ cd cursedcanvas
 bun install
 bun run bridge   # terminal 1 — SSE on :8787
 bun run dev      # terminal 2 — Vite HMR viewer
+# Serve another project's canvases instead of this repo's:
+# bun run bridge -- --dir <path> & bun run dev -- --dir <path>
 ```
 
 Or serve the production build locally:

@@ -91,10 +91,11 @@ Watch the bridge SSE stream and update canvases when events arrive. The viewer d
 
 ```bash
 bun run bridge   # http://127.0.0.1:8787
+bun run bridge -- --dir ~/workspace/herd/docs  # serve another project's canvases
 curl -N http://127.0.0.1:8787/events
 ```
 
-Before debugging an empty stream, check `GET /health` for `{"ok":true,"mode":"events","subscribers":N}`. The bridge binds `127.0.0.1:8787` by default. To change the bind, set `BRIDGE_HOST` or `BRIDGE_PORT` and build the viewer with a matching `VITE_BRIDGE_URL`.
+Before debugging an empty stream, check `GET /health` for `{"ok":true,"mode":"events","subscribers":N}`. The bridge binds `127.0.0.1:8787` by default. To change the bind, set `BRIDGE_HOST` or `BRIDGE_PORT` (or pass `--host` / `--port`) and build the viewer with a matching `VITE_BRIDGE_URL`. To point file paths at another project, pass `--dir <path>` (or set `CURSEDCANVAS_ROOT`).
 
 In the viewer, select **Annotate**. Click a block or drag a region. Add a comment. Select **Send to agents**. The viewer publishes an `annotation` event with file metadata, `target`, and `rect`.
 
@@ -164,4 +165,4 @@ This repo packages one catalog canvas: `canvases/example-overview.canvas.tsx` â€
 
 ## After writing
 
-Tell the human the canvas filename. They can review it with the viewer: run `bun run dev` and pick the canvas in the topbar switcher. For live annotate-to-agent updates, also run `bun run bridge`.
+Tell the human the canvas filename. They can review it with the viewer: run `bun run dev` and pick the canvas in the topbar switcher (or `bun run dev -- --dir <path>` to list another project's `canvases/`). For live annotate-to-agent updates, also run `bun run bridge`.

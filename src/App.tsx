@@ -17,8 +17,29 @@ import { requestAnnotate } from "./annotateEvents";
 import { checkBridge, dispatchToBridge, postAnnotation, type BridgeResult } from "./bridgeClient";
 
 type CanvasModule = { default: ComponentType };
+type CanvasLoader = () => Promise<CanvasModule>;
 
-const modules = import.meta.glob<CanvasModule>("../canvases/*.canvas.tsx");
+/**
+ * Canvas inventory. Defaults to this repo's `canvases/`. When the dev server
+ * runs with `CURSEDCANVAS_DIR` (`bun run dev -- --dir <path>`), vite injects
+ * that project's canvas files as /@fs URLs instead.
+ */
+function localCanvasModules(): Record<string, CanvasLoader> {
+  return import.meta.glob<CanvasModule>("../canvases/*.canvas.tsx");
+}
+
+function externalCanvasModules(files: string[]): Record<string, CanvasLoader> {
+  return Object.fromEntries(
+    files.map((file) => {
+      const id = (file.split("/").pop() ?? file).replace(/\.canvas\.tsx$/, "");
+      return [`../canvases/${id}.canvas.tsx`, () => import(/* @vite-ignore */ file)];
+    }),
+  );
+}
+
+const modules: Record<string, CanvasLoader> = __EXTERNAL_CANVAS_FILES__
+  ? externalCanvasModules(__EXTERNAL_CANVAS_FILES__)
+  : localCanvasModules();
 const lazyCanvases = Object.fromEntries(
   Object.entries(modules).map(([path, loader]) => [path, lazy(loader)]),
 ) as Record<string, LazyExoticComponent<ComponentType>>;
