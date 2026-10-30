@@ -13,6 +13,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { canvasActionToHost } from "./types.mjs";
 import { resolveCanvasFile } from "./meta.mjs";
+import { clampRecentLimit, readBody, validRect } from "./validate.mjs";
 import { attachSse, publish, recentEvents, subscriberCount } from "./events.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -38,22 +39,6 @@ function json(res, status, body) {
     ...corsHeaders(),
   });
   res.end(payload);
-}
-
-function readBody(req) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    req.on("data", (c) => chunks.push(c));
-    req.on("end", () => {
-      try {
-        const raw = Buffer.concat(chunks).toString("utf8");
-        resolve(raw ? JSON.parse(raw) : {});
-      } catch (err) {
-        reject(err);
-      }
-    });
-    req.on("error", reject);
-  });
 }
 
 /**
@@ -98,9 +83,8 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.method === "GET" && url.pathname === "/recent") {
-    const limit = Number(url.searchParams.get("limit") ?? 20);
     json(res, 200, {
-      events: recentEvents(Number.isFinite(limit) ? limit : 20),
+      events: recentEvents(clampRecentLimit(url.searchParams.get("limit") ?? 20)),
     });
     return;
   }
@@ -139,7 +123,7 @@ const server = http.createServer(async (req, res) => {
         kind: "annotation",
         text,
         target,
-        rect: body.rect,
+        rect: validRect(body.rect),
         c4Id,
         c4Label,
         c4From,
