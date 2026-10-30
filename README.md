@@ -6,7 +6,7 @@ Agents write canvases into `canvases/`. You review them in the browser via a Vit
 
 **Bun-first** (`packageManager: bun@1.4.4`). Distributed via [GitHub Releases](https://github.com/wnoronha/cursedcanvas/releases) (not npm).
 
-## Install / run
+## Install and run
 
 ### From a GitHub Release (prebuilt viewer)
 
@@ -70,7 +70,7 @@ bun run check      # all of the above (fmt:check → … → build)
 
 ### Agent event bus
 
-In the viewer: **Annotate** → select a region → comment → Send. That (and canvas `useCanvasAction` buttons) publish to SSE. Agents watch and edit files:
+In the viewer, select **Annotate**. Click a block or drag a region. Add a comment. Select **Send**. Those annotations (and canvas `useCanvasAction` buttons) publish to SSE. Agents watch and edit files:
 
 ```bash
 curl -N http://127.0.0.1:8787/events
@@ -83,7 +83,7 @@ curl -N http://127.0.0.1:8787/events
 | `POST /annotate` | Freeform note (`text`, `canvasId`, `path`, `target`, …) |
 | `POST /action`   | Publish a canvas action                                 |
 
-## Authoring vs developing this repo
+## Authoring and developing this repo
 
 | Doc                                      | Audience                                                   |
 | ---------------------------------------- | ---------------------------------------------------------- |

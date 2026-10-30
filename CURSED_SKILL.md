@@ -17,7 +17,7 @@ belong in another tool.
 1. Write **exactly one** file: `canvases/<kebab-name>.canvas.tsx`.
 2. Import **only** from `cursor/canvas`. No relative imports, no npm packages, no Node built-ins.
 3. **Default-export** the top-level component.
-4. Embed all data inline. **No `fetch()` / network calls.**
+4. Embed all data inline. **No `fetch()` or network calls.**
 5. Never ship empty placeholder sections. If you lack data, omit the section or ask.
 
 Example:
@@ -50,11 +50,11 @@ Prefer built-in primitives over hand-rolled markup:
 - Surfaces: `Card`, `CardHeader`, `CardBody`, `Callout`, `Pill`, `Stat`, `Table`
 - Forms: `TextInput`, `TextArea`, `Checkbox`, `Toggle`, `Select`, `Button`, `IconButton`
 - Visuals: `BarChart`, `LineChart`, `PieChart`, `DiffView`, `DiffStats`, `UsageBar`, `Swatch`, `TodoList`
-- Diagrams: `Diagram` (alias `Mermaid`) — Mermaid syntax rendered by [Pele](https://pele.run); use for flowchart / sequence / C4Context / C4Container / C4Component / classDiagram / etc.
+- Diagrams: `Diagram` (alias `Mermaid`). It renders Mermaid syntax through [Pele](https://pele.run). Use it for `flowchart`, `sequence`, `C4Context`, `C4Container`, `C4Component`, or `classDiagram`.
 - Layout math: `computeDAGLayout` (you render SVG/HTML yourself; prefer `Diagram` when Mermaid fits)
 - State: `useCanvasState(key, default)` — persists across reloads
 - Theme: `useHostTheme()` — use token colors (`theme.text.primary`, `theme.fill.tertiary`, …). No hardcoded hex.
-- Actions: `useCanvasAction()` — in Cursor IDE these open composer/files; in the cursed-canvas browser viewer they **publish** to the localhost event bus (see below)
+- Actions: `useCanvasAction()` — in Cursor IDE these open the composer or files. In the cursed-canvas browser viewer they **publish** to the localhost event bus (see below)
 
 ### Diagrams (Pele)
 
@@ -71,10 +71,10 @@ import { Diagram } from "cursor/canvas";
 
 C4 levels: `C4Context` (C1), `C4Container` (C2), `C4Component` (C3). For Code (L4), use `classDiagram`.
 
-`Diagram` `theme` prop (Pele CSS variables — https://pele.run/theming):
+`Diagram` `theme` prop (see [Pele theming](https://pele.run/theming) for the CSS variables):
 
 - `auto` (default) — Pele light/dark sheet from host kind
-- `dark` / `light` — Pele stock sheets
+- `dark` or `light` — Pele stock sheets
 - `host` — map solid Cursor palette colors into `--pele-*` (avoid alpha fill/stroke tokens)
 
 Mindmap caveat: do not name a child node `mindmap` (keyword collision). Quote or rename it.
@@ -94,9 +94,9 @@ bun run bridge   # http://127.0.0.1:8787
 curl -N http://127.0.0.1:8787/events
 ```
 
-Check `GET /health` (`{"ok":true,"mode":"events","subscribers":N}`) to confirm the bridge is up before debugging an empty stream. Bridge binds `127.0.0.1:8787` by default (`BRIDGE_HOST`/`BRIDGE_PORT` to change); the viewer targets the same default unless built with `VITE_BRIDGE_URL` — keep them in agreement.
+Before debugging an empty stream, check `GET /health` for `{"ok":true,"mode":"events","subscribers":N}`. The bridge binds `127.0.0.1:8787` by default. To change the bind, set `BRIDGE_HOST` or `BRIDGE_PORT` and build the viewer with a matching `VITE_BRIDGE_URL`.
 
-In the viewer: **Annotate** → select a region (click a block or drag) → add a comment → **Send to agents**. That publishes an `annotation` event with file metadata + `target` + `rect`.
+In the viewer, select **Annotate**. Click a block or drag a region. Add a comment. Select **Send to agents**. The viewer publishes an `annotation` event with file metadata, `target`, and `rect`.
 
 Event kinds:
 
@@ -104,13 +104,13 @@ Event kinds:
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | `hello`      | Stream connected (`id: 0` always first); cwd + endpoint hints at `data.action.{cwd,events,annotate}`                                                                                           | Ready to receive                                                   |
 | `action`     | Canvas `useCanvasAction` (`openFile`, `newComposerChat`→`askAgent`, `openAgent`→`resumeAgent`; `askAgent`/`resumeAgent` passthrough). Published with `source: "viewer"`; `spawn` field ignored | Read `data.action` + file fields; edit the canvas or open the path |
-| `annotation` | Human Annotate → select → comment                                                                                                                                                              | Follow `data.text`; use `data.target` / `absolutePath` / `path`    |
+| `annotation` | Human Annotate → select → comment                                                                                                                                                              | Follow `data.text`; use `data.target`, `absolutePath`, or `path`   |
 
 ### Durability and cursors
 
 - Events are kept in an **in-memory ring buffer** (last **200**). Not durable — bridge restart clears the log. This is a live bus, not a persistent queue.
 - The server does **not** track per-agent offsets. Live SSE subscribers receive events as they are published.
-- On reconnect, send request header `Last-Event-ID: <id>` to replay buffered events with `id > Last-Event-ID`. Plain `curl -N` does not remember a cursor — agents must store the last consumed `id` themselves (or use `EventSource`, which resends `Last-Event-ID` automatically). An unparsable header falls back to the last 20 buffered events. The server also sends `: ping` heartbeats every 15s.
+- On reconnect, send request header `Last-Event-ID: <id>` to replay buffered events with `id > Last-Event-ID`. Plain `curl -N` does not remember a cursor. Agents must store the last consumed `id` themselves (or use `EventSource`, which resends `Last-Event-ID` automatically). An unparsable header falls back to the last 20 buffered events. The server also sends `: ping` heartbeats every 15s.
 - `GET /recent?limit=N` returns the same in-memory buffer as JSON (default 20, catch-up without SSE).
 
 Payload shape (JSON in `data:`):
@@ -139,18 +139,18 @@ Payload shape (JSON in `data:`):
 }
 ```
 
-`instruction` is server-synthesized (`Edit the canvas file (<absolutePath>) <C4 hint> — <text>`, where the C4 hint is `— C4 Rel from→to (id)`, `— C4 element "label" (id)`, or `— focus UI block "target"`). `action` events carry the mapped host action (`openFile` / `askAgent` / `resumeAgent`) plus `text`/`instruction` derived per type.
+`instruction` is server-synthesized. It reads `Edit the canvas file (<absolutePath>) <C4 hint> — <text>`. The C4 hint is `— C4 Rel from→to (id)`, `— C4 element "label" (id)`, or `— focus UI block "target"`. `action` events carry the mapped host action (`openFile`, `askAgent`, or `resumeAgent`) plus the derived `text` and `instruction`.
 
-Use `absolutePath` (or `cwd` + `path`) to open/edit the file. Use `target` + `text` (or `instruction`) for what to change.
+Use `absolutePath` (or `cwd` with `path`) to open or edit the file. Use `target` with `text` (or `instruction`) for what to change.
 
 Rules when handling an event:
 
-1. Edit **only** the referenced canvas (`absolutePath` / `path`) — or ask if missing.
+1. Edit **only** the referenced canvas (`absolutePath` or `path`). Ask if it is missing.
 2. Keep the file a valid `cursor/canvas` default export — still no `fetch()`, no extra imports.
-3. After writing, the Vite viewer HMR-refreshes; no need to restart.
+3. After writing, the Vite viewer refreshes through HMR. No restart is needed.
 4. Optional: `GET /recent` or reconnect with `Last-Event-ID` if you missed live events (still only the last 200, in memory).
 
-Publish an annotation yourself (tests / other tools):
+Publish an annotation yourself from tests or other tools:
 
 ```bash
 curl -X POST http://127.0.0.1:8787/annotate \
@@ -164,4 +164,4 @@ This repo packages one catalog canvas: `canvases/example-overview.canvas.tsx` �
 
 ## After writing
 
-Tell the human the canvas filename and that they can review it with the viewer (`bun run dev` + topbar canvas switcher), while the bridge runs if they want live annotate → agent updates (`bun run bridge`).
+Tell the human the canvas filename. They can review it with the viewer: run `bun run dev` and pick the canvas in the topbar switcher. For live annotate-to-agent updates, also run `bun run bridge`.
