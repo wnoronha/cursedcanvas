@@ -178,6 +178,7 @@ function Viewer() {
   useEffect(() => {
     let cancelled = false;
     const tick = async () => {
+      if (document.hidden) return;
       const info = await checkBridge();
       if (cancelled) return;
       if (!info) {
