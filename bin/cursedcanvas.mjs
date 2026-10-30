@@ -13,7 +13,7 @@ import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { parseArgs, safeJoin } from "./lib.mjs";
+import { browserCommand, parseArgs, safeJoin } from "./lib.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PKG_ROOT = path.resolve(__dirname, "..");
@@ -119,10 +119,15 @@ function startBridge({ root, host, port }) {
 }
 
 async function openBrowser(url) {
-  const { platform } = process;
-  const cmd = platform === "darwin" ? "open" : platform === "win32" ? "start" : "xdg-open";
+  const cmd = browserCommand();
   try {
-    spawn(cmd, [url], { stdio: "ignore", detached: true, shell: platform === "win32" }).unref();
+    const child = spawn(cmd, [url], {
+      stdio: "ignore",
+      detached: true,
+      shell: process.platform === "win32",
+    });
+    child.on("error", () => {});
+    child.unref();
   } catch {
     /* ignore */
   }
@@ -130,6 +135,7 @@ async function openBrowser(url) {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
+  if (opts.error) console.error(opts.error);
   if (opts.unknown) console.error(`Unknown option: ${opts.unknown}`);
   if (opts.help) {
     printHelp();

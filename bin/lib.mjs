@@ -14,6 +14,11 @@ export function parseArgs(argv, env = {}) {
     bridge: true,
     open: true,
   };
+  const invalidPort = (flag, raw) => {
+    opts.help = true;
+    opts.exitCode = 1;
+    opts.error = `Invalid ${flag} ${JSON.stringify(raw)}: expected a port 1-65535`;
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "-h" || a === "--help") {
@@ -27,9 +32,15 @@ export function parseArgs(argv, env = {}) {
     } else if (a === "--dir") {
       opts.dir = path.resolve(cwd, argv[++i] ?? ".");
     } else if (a === "--port") {
-      opts.port = Number(argv[++i]);
+      const raw = argv[++i];
+      const n = Number(raw);
+      if (!Number.isInteger(n) || n < 1 || n > 65535) invalidPort("--port", raw);
+      else opts.port = n;
     } else if (a === "--bridge-port") {
-      opts.bridgePort = Number(argv[++i]);
+      const raw = argv[++i];
+      const n = Number(raw);
+      if (!Number.isInteger(n) || n < 1 || n > 65535) invalidPort("--bridge-port", raw);
+      else opts.bridgePort = n;
     } else if (a === "--host") {
       opts.host = argv[++i] ?? opts.host;
     } else if (a.startsWith("-")) {
@@ -39,6 +50,13 @@ export function parseArgs(argv, env = {}) {
     }
   }
   return opts;
+}
+
+/** OS open command for a URL. Pure so tests can pin the mapping. */
+export function browserCommand(platform = process.platform) {
+  if (platform === "darwin") return "open";
+  if (platform === "win32") return "start";
+  return "xdg-open";
 }
 
 /** Prevent path traversal out of the static root. */
